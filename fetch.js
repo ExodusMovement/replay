@@ -19,6 +19,7 @@ const sortHeaders = (headers) => {
 const serializeRequest = async (resource, options = {}) => {
   const serializable = Object.entries(options).filter(([key, value]) => {
     if (key === 'body' || key === 'headers') return false // included directly
+    if (key === 'trailers') throw new Error('Trailers not supported in this version') // not in spec (yet?)
     if (key === 'signal') return false // ignored
     if (!value || ['string', 'number', 'boolean'].includes(typeof value)) return true
     throw new Error(`Can not process option ${key} with value type ${typeof value}`)
@@ -80,6 +81,7 @@ function makeResponse({ bodyType, body }, { status, statusText, headers, ok, ...
   // init supports only { status, statusText, headers } per spec, we have to restore the rest manually
   const response = makeResponseBase(bodyType, body, { status, statusText, headers })
   if (response.ok !== ok) throw new Error('Unexpected: ok mismatch')
+  if (Object.hasOwn(extra, 'trailers')) throw new Error('Trailers not supported in this version')
   // We have { url, redirected, type } to set here
   const wrap = ([name, value]) => [name, { get: () => value, enumerable: true }]
   Object.defineProperties(response, Object.fromEntries(Object.entries(extra).map((el) => wrap(el))))
