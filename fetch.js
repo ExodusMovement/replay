@@ -51,7 +51,10 @@ function deserializeResponseBody(body, bodyType) {
 }
 
 const serializeResponse = async (resource, options = {}, response) => {
-  if (!['default', 'basic'].includes(response.type)) throw new Error('Can not record fetch response')
+  if (!['default', 'basic'].includes(response.type)) {
+    throw new Error(`Can not record fetch response, unexpected type: ${response.type}`)
+  }
+
   return {
     request: await serializeRequest(resource, options),
     status: response.status,
