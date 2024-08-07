@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 import fs from 'node:fs'
 import path from 'node:path'
-import fetch, { Headers } from 'node-fetch'
+import fetch, { Headers, FormData } from 'node-fetch'
 
 import * as replay from '../index.js'
 import { dir as fixturesDir } from './fixtures/index.cjs'
@@ -21,7 +21,7 @@ describe('fetch (node-fetch), recording', () => {
     assert.deepEqual(JSON.parse(JSON.stringify(log.map(cleanLog))), expected.map(cleanLog))
   })
 
-  Object.assign(globalThis, { Headers }) // only for tests to check this for equality, not used in recorder
+  Object.assign(globalThis, { Headers, FormData }) // only for tests, not used in recorder
   globalThis.fetch = replay.fetchRecorder(log, { fetch })
   globalThis.NODE_FETCH_BROKEN_CLONE = true // https://github.com/node-fetch/node-fetch/issues/1784
   require('./fetch.cjs')

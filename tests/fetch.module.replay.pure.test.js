@@ -13,6 +13,7 @@ describe('fetch (node-fetch), replaying (no Response/Headers/fetch)', () => {
   const log = JSON.parse(fs.readFileSync(file, 'utf8'))
   delete globalThis.Response
   delete globalThis.Headers
+  delete globalThis.FormData
   delete globalThis.fetch
   globalThis.fetch = replay.fetchReplayer(log)
   require('./fetch.cjs')

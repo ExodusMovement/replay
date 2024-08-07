@@ -73,7 +73,7 @@ test('https://example.com/404', async () => {
   assert.match(await res.text(), /This domain is for use in illustrative examples in documents/) // same text
 })
 
-test('POST https://jsonplaceholder.typicode.com/posts', async () => {
+test('POST https://jsonplaceholder.typicode.com/posts with JSON', async () => {
   const data = { title: 'foo', body: 'bar', userId: 1 }
   const res = await fetch('https://jsonplaceholder.typicode.com/posts', {
     method: 'POST',
@@ -85,4 +85,17 @@ test('POST https://jsonplaceholder.typicode.com/posts', async () => {
   assert.equal(res.ok, true)
   const post = await res.json()
   assert.deepEqual(post, { ...data, id: 101 })
+})
+
+const testFormData = typeof FormData === 'undefined' ? test.skip : test
+testFormData('POST https://dummyjson.com/posts/add with FormData', async () => {
+  const data = new FormData()
+  data.set('title', 'awesome')
+  data.set('userId', 42)
+  const res = await fetch('https://dummyjson.com/posts/add', { method: 'POST', body: data })
+  assert.equal(res.status, 201)
+  assert.equal(res.statusText, 'Created')
+  assert.equal(res.ok, true)
+  const post = await res.json()
+  assert.deepEqual(post, { title: 'awesome', userId: '42', id: 252 })
 })
