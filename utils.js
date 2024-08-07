@@ -1,6 +1,6 @@
 export const isPlainObject = (x) => x && [null, Object.prototype].includes(Object.getPrototypeOf(x))
 
-const flatten = (json) => json.replaceAll(/(\n\s*},)\n\s*({\n)/g, '$1 $2')
+const flatten = (json) => json.replaceAll(/(\n[\t ]*},)\n[\t ]*({\n)/g, '$1 $2')
 
 // For pretty recordings formatting
 export function prettyJSON(data, { width = 120 } = {}) {
