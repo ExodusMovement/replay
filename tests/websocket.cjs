@@ -7,7 +7,6 @@
 
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { expect } = require('expect') // TODO: use asserts
 
 const message = async (ee) => on(ee, 'message').then((event) => event.data)
 const on = (ee, acc, rej = 'error') =>
@@ -16,40 +15,40 @@ const on = (ee, acc, rej = 'error') =>
   })
 
 test('static properties', () => {
-  expect(WebSocket.CONNECTING).toBe(0)
-  expect(WebSocket.OPEN).toBe(1)
-  expect(WebSocket.CLOSING).toBe(2)
-  expect(WebSocket.CLOSED).toBe(3)
+  assert.equal(WebSocket.CONNECTING, 0)
+  assert.equal(WebSocket.OPEN, 1)
+  assert.equal(WebSocket.CLOSING, 2)
+  assert.equal(WebSocket.CLOSED, 3)
 })
 
 // this fails on ws because of CloudFlare?
 test('javascript.info /demo/hello', async (t) => {
   const socket = new WebSocket('wss://javascript.info/article/websocket/demo/hello', ['test'])
-  expect(socket.extensions).toBe('')
-  expect(socket.protocol).toBe('')
-  expect(socket.readyState).toBe(WebSocket.CONNECTING)
+  assert.equal(socket.extensions, '')
+  assert.equal(socket.protocol, '')
+  assert.equal(socket.readyState, WebSocket.CONNECTING)
 
   // Attach a listener before .onmessage
   const listenerMessagesBefore = []
   socket.addEventListener('message', (event) => {
-    expect(listenerMessagesBefore).toEqual(messages)
+    assert.deepStrictEqual(listenerMessagesBefore, messages)
     listenerMessagesBefore.push(event.data)
-    expect(listenerMessagesBefore).not.toEqual(messages)
+    assert.notDeepStrictEqual(listenerMessagesBefore, messages)
   })
 
   const messages = []
   socket.onmessage = (event) => {
     messages.push(event.data)
     socket.close()
-    expect(socket.readyState).toBe(WebSocket.CLOSING)
+    assert.equal(socket.readyState, WebSocket.CLOSING)
   }
 
   // Attach a listener after .onmessage
   const listenerMessagesAfter = []
   socket.addEventListener('message', (event) => {
-    expect(listenerMessagesAfter).not.toEqual(messages)
+    assert.notDeepEqual(listenerMessagesAfter, messages)
     listenerMessagesAfter.push(event.data)
-    expect(listenerMessagesAfter).toEqual(messages)
+    assert.deepEqual(listenerMessagesAfter, messages)
   })
 
   try {
@@ -62,47 +61,47 @@ test('javascript.info /demo/hello', async (t) => {
     throw err
   }
 
-  expect(socket.protocol).toBe('test')
-  expect(socket.readyState).toBe(WebSocket.OPEN)
-  expect(messages.length).toBe(0)
-  expect(listenerMessagesBefore).toEqual(messages)
-  expect(listenerMessagesAfter).toEqual(messages)
+  assert.equal(socket.protocol, 'test')
+  assert.equal(socket.readyState, WebSocket.OPEN)
+  assert.equal(messages.length, 0)
+  assert.deepEqual(listenerMessagesBefore, messages)
+  assert.deepEqual(listenerMessagesAfter, messages)
 
-  expect(socket.bufferedAmount).toBe(0)
+  assert.equal(socket.bufferedAmount, 0)
   socket.send('Hi there')
-  expect(socket.bufferedAmount).not.toBe(0)
-  expect(socket.bufferedAmount).toBeGreaterThanOrEqual(8)
+  assert.notEqual(socket.bufferedAmount, 0)
+  assert.ok(socket.bufferedAmount >= 8)
 
   const result = await on(socket, 'close')
 
-  expect(result.type).toBe('close')
-  expect(socket.protocol).toBe('test')
-  expect(socket.readyState).toBe(WebSocket.CLOSED)
-  expect(messages.length).toBe(1)
-  expect(messages).toEqual(['Hello from server, there!'])
-  expect(listenerMessagesBefore).toEqual(messages)
-  expect(listenerMessagesAfter).toEqual(messages)
+  assert.equal(result.type, 'close')
+  assert.equal(socket.protocol, 'test')
+  assert.equal(socket.readyState, WebSocket.CLOSED)
+  assert.equal(messages.length, 1)
+  assert.deepEqual(messages, ['Hello from server, there!'])
+  assert.deepEqual(listenerMessagesBefore, messages)
+  assert.deepEqual(listenerMessagesAfter, messages)
 })
 
 test('connection error', async () => {
   const socket = new WebSocket('wss://localhost:1/')
-  expect(socket.extensions).toBe('')
-  expect(socket.protocol).toBe('')
-  expect(socket.readyState).toBe(WebSocket.CONNECTING)
+  assert.equal(socket.extensions, '')
+  assert.equal(socket.protocol, '')
+  assert.equal(socket.readyState, WebSocket.CONNECTING)
 
   const messages = []
   socket.onmessage = (event) => messages.push(event.data)
 
   const errorEvent = await on(socket, 'error', 'open') // Swapped on a purpose!
 
-  expect(errorEvent.type).toBe('error')
-  expect(errorEvent.error).toBeTruthy()
-  expect(errorEvent.error instanceof Error).toBe(true)
+  assert.equal(errorEvent.type, 'error')
+  assert.ok(errorEvent.error)
+  assert.ok(errorEvent.error instanceof Error)
   assert.equal(typeof errorEvent.error.message, 'string')
 
-  expect(socket.protocol).toBe('')
-  expect(messages.length).toBe(0)
-  expect(messages).toEqual([])
+  assert.equal(socket.protocol, '')
+  assert.equal(messages.length, 0)
+  assert.deepEqual(messages, [])
 })
 
 test('buffer/blob echo', { skip: !globalThis.Blob }, async () => {
@@ -110,34 +109,38 @@ test('buffer/blob echo', { skip: !globalThis.Blob }, async () => {
   const messages = []
   socket.addEventListener('message', (event) => messages.push(event.data))
 
-  expect(socket.readyState).toBe(WebSocket.CONNECTING)
+  assert.equal(socket.readyState, WebSocket.CONNECTING)
 
   await on(socket, 'open')
-  expect(socket.readyState).toBe(WebSocket.OPEN)
-  expect(messages.length).toBe(0)
+  assert.equal(socket.readyState, WebSocket.OPEN)
+  assert.equal(messages.length, 0)
 
-  expect(await message(socket)).toMatch(/^Request served by/)
-  expect(messages.length).toBe(1)
+  assert.match(await message(socket), /^Request served by/)
+  assert.equal(messages.length, 1)
 
   const toArrayBuffer = (t) => t.buffer.slice(t.byteOffset, t.byteOffset + t.byteLength)
   const byteSize = (x) => x.byteLength ?? x.size ?? x.length
-  const toBuffer = async (x) => Buffer.from(x instanceof Blob ? await x.arrayBuffer() : x) // async or sync
+  const toBuffer = (x) => {
+    if (x instanceof Blob) return x.arrayBuffer().then((buf) => Buffer.from(buf)) // async
+    return x.buffer ? Buffer.from(x.buffer, x.byteOffset, x.byteLength) : Buffer.from(x) // sync
+  }
+
   const expectBufferResponse = async (input, type) => {
     socket.send(input)
     await expectBuffer(await message(socket), input, type)
   }
 
   const expectBuffer = async (data, input, type) => {
-    expect(data).toBeTruthy()
-    // expect.toBe is cryptic on this: expect(Blob.prototype).toBe(ArrayBuffer.prototype), hence we use ===
-    expect(Object.getPrototypeOf(data) === type.prototype).toBe(true)
-    expect(byteSize(data)).toBe(byteSize(input))
+    assert.ok(data)
+    // expect.toBe is cryptic on this: expect(Blob.prototype).toBe(ArrayBuffer.prototype)
+    assert.equal(Object.getPrototypeOf(data), type.prototype)
+    assert.equal(byteSize(data), byteSize(input))
     // expect.toEqual can't compare ArrayBuffer instances and always returns true!
-    expect(await toBuffer(data)).toEqual(await toBuffer(data))
+    assert.deepEqual(await toBuffer(data), await toBuffer(input))
   }
 
   socket.binaryType = 'arraybuffer'
-  expect(socket.binaryType).toBe('arraybuffer')
+  assert.equal(socket.binaryType, 'arraybuffer')
   await expectBufferResponse('Hello here', String)
   await expectBufferResponse(Buffer.from('Hello there'), ArrayBuffer)
   await expectBufferResponse(new Uint8Array([3, 5, 7]), ArrayBuffer)
@@ -146,7 +149,7 @@ test('buffer/blob echo', { skip: !globalThis.Blob }, async () => {
   await expectBufferResponse(new Blob(['one', 'two']), ArrayBuffer)
 
   socket.binaryType = 'blob'
-  expect(socket.binaryType).toBe('blob')
+  assert.equal(socket.binaryType, 'blob')
   await expectBufferResponse('This is not a blob', String)
   await expectBufferResponse(Buffer.from('This is a blob'), Blob)
   await expectBufferResponse(new Uint8Array([11, 22, 44, 57]), Blob)
@@ -169,13 +172,13 @@ test('buffer/blob echo', { skip: !globalThis.Blob }, async () => {
   })
   await expectBuffer(arr[0], Buffer.from('Sending a Blob'), Blob)
   await expectBuffer(arr[1], Buffer.from('Sending a Buffer'), Blob)
-  expect(arr[2]).toBe('Sending a string')
+  assert.equal(arr[2], 'Sending a string')
 
   socket.close()
-  expect(socket.readyState).toBe(WebSocket.CLOSING)
+  assert.equal(socket.readyState, WebSocket.CLOSING)
 
   const result = await on(socket, 'close')
-  expect(result.type).toBe('close')
-  expect(socket.readyState).toBe(WebSocket.CLOSED)
-  expect(messages.length).toBe(16) // 1 + 6 + 6 + 3
+  assert.equal(result.type, 'close')
+  assert.equal(socket.readyState, WebSocket.CLOSED)
+  assert.equal(messages.length, 16) // 1 + 6 + 6 + 3
 })
