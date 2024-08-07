@@ -72,3 +72,17 @@ test('https://example.com/404', async () => {
 
   assert.match(await res.text(), /This domain is for use in illustrative examples in documents/) // same text
 })
+
+test('POST https://jsonplaceholder.typicode.com/posts', async () => {
+  const data = { title: 'foo', body: 'bar', userId: 1 }
+  const res = await fetch('https://jsonplaceholder.typicode.com/posts', {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: { 'Content-type': 'application/json; charset=UTF-8' },
+  })
+  assert.equal(res.status, 201)
+  assert.equal(res.statusText, 'Created')
+  assert.equal(res.ok, true)
+  const post = await res.json()
+  assert.deepEqual(post, { ...data, id: 101 })
+})
