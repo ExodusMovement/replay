@@ -1,0 +1,150 @@
+[
+  {
+    "url": "wss://javascript.info/article/websocket/demo/hello",
+    "protocols": ["test"],
+    "log": [
+      { "type": "get protocol", "at": 19, "value": "" },
+      { "type": "get readyState", "at": 19, "value": 0 },
+      { "type": "open", "at": 408 },
+      { "type": "get protocol", "at": 408, "value": "test" },
+      { "type": "get readyState", "at": 408, "value": 1 },
+      { "type": "get bufferedAmount", "at": 409, "value": 0 },
+      { "type": "send()", "at": 409, "data": "Hi there" },
+      { "type": "get bufferedAmount", "at": 409, "value": 8 },
+      { "type": "get bufferedAmount", "at": 409, "value": 8 },
+      { "type": "message", "at": 524, "data": "Hello from server, there!", "origin": "wss://javascript.info" },
+      { "type": "close()", "at": 525 },
+      { "type": "get readyState", "at": 525, "value": 2 },
+      { "type": "close", "at": 643, "code": 1005, "reason": "", "wasClean": true },
+      { "type": "get protocol", "at": 643, "value": "test" },
+      { "type": "get readyState", "at": 643, "value": 3 }
+    ]
+  }, {
+    "url": "wss://localhost:1/",
+    "log": [
+      { "type": "get protocol", "at": 0, "value": "" },
+      { "type": "get readyState", "at": 0, "value": 0 },
+      { "type": "error", "at": 1, "error": { "message": "Received network error or non-101 status code." } },
+      { "type": "get protocol", "at": 1, "value": "" }
+    ]
+  }, {
+    "url": "wss://echo.websocket.org/",
+    "log": [
+      { "type": "get readyState", "at": 1, "value": 0 },
+      { "type": "open", "at": 265 },
+      { "type": "get readyState", "at": 265, "value": 1 },
+      {
+        "type": "message",
+        "at": 266,
+        "data": "Request served by 1781505b56ee58",
+        "origin": "wss://echo.websocket.org"
+      },
+      { "type": "set binaryType", "at": 267, "value": "arraybuffer" },
+      { "type": "get binaryType", "at": 268, "value": "arraybuffer" },
+      { "type": "send()", "at": 268, "data": "Hello here" },
+      { "type": "message", "at": 371, "data": "Hello here", "origin": "wss://echo.websocket.org" },
+      { "type": "send()", "at": 372, "data": { "type": "Buffer", "data.base64": "SGVsbG8gdGhlcmU=" } },
+      {
+        "type": "message",
+        "at": 476,
+        "data": { "type": "ArrayBuffer", "data.hex": "48656c6c6f207468657265" },
+        "origin": "wss://echo.websocket.org"
+      },
+      { "type": "send()", "at": 477, "data": { "type": "Uint8Array", "data.hex": "030507" } },
+      {
+        "type": "message",
+        "at": 585,
+        "data": { "type": "ArrayBuffer", "data.hex": "030507" },
+        "origin": "wss://echo.websocket.org"
+      },
+      { "type": "send()", "at": 587, "data": { "type": "Uint32Array", "data.hex": "ffffffff0000010000000080" } },
+      {
+        "type": "message",
+        "at": 691,
+        "data": { "type": "ArrayBuffer", "data.hex": "ffffffff0000010000000080" },
+        "origin": "wss://echo.websocket.org"
+      },
+      { "type": "send()", "at": 693, "data": { "type": "ArrayBuffer", "data.hex": "012a0002" } },
+      {
+        "type": "message",
+        "at": 797,
+        "data": { "type": "ArrayBuffer", "data.hex": "012a0002" },
+        "origin": "wss://echo.websocket.org"
+      }, {
+        "type": "send()",
+        "at": 799,
+        "data": { "type": "Blob", "data.hex": "6f6e6574776f", "meta": { "size": 6, "type": "" } }
+      }, {
+        "type": "message",
+        "at": 906,
+        "data": { "type": "ArrayBuffer", "data.hex": "6f6e6574776f" },
+        "origin": "wss://echo.websocket.org"
+      },
+      { "type": "set binaryType", "at": 906, "value": "blob" },
+      { "type": "get binaryType", "at": 907, "value": "blob" },
+      { "type": "send()", "at": 907, "data": "This is not a blob" },
+      { "type": "message", "at": 1011, "data": "This is not a blob", "origin": "wss://echo.websocket.org" },
+      { "type": "send()", "at": 1012, "data": { "type": "Buffer", "data.base64": "VGhpcyBpcyBhIGJsb2I=" } },
+      {
+        "type": "message",
+        "at": 1117,
+        "data": { "type": "Blob", "data.hex": "54686973206973206120626c6f62", "meta": { "size": 14, "type": "" } },
+        "origin": "wss://echo.websocket.org"
+      },
+      { "type": "send()", "at": 1118, "data": { "type": "Uint8Array", "data.hex": "0b162c39" } },
+      {
+        "type": "message",
+        "at": 1222,
+        "data": { "type": "Blob", "data.hex": "0b162c39", "meta": { "size": 4, "type": "" } },
+        "origin": "wss://echo.websocket.org"
+      }, {
+        "type": "send()",
+        "at": 1223,
+        "data": { "type": "Uint32Array", "data.hex": "00000100ffffffff0000000000000080" }
+      }, {
+        "type": "message",
+        "at": 1327,
+        "data": { "type": "Blob", "data.hex": "00000100ffffffff0000000000000080", "meta": { "size": 16, "type": "" } },
+        "origin": "wss://echo.websocket.org"
+      },
+      { "type": "send()", "at": 1329, "data": { "type": "ArrayBuffer", "data.hex": "33003534" } },
+      {
+        "type": "message",
+        "at": 1436,
+        "data": { "type": "Blob", "data.hex": "33003534", "meta": { "size": 4, "type": "" } },
+        "origin": "wss://echo.websocket.org"
+      }, {
+        "type": "send()",
+        "at": 1437,
+        "data": { "type": "Blob", "data.hex": "7468726565666f757266697665", "meta": { "size": 13, "type": "" } }
+      }, {
+        "type": "message",
+        "at": 1544,
+        "data": { "type": "Blob", "data.hex": "7468726565666f757266697665", "meta": { "size": 13, "type": "" } },
+        "origin": "wss://echo.websocket.org"
+      }, {
+        "type": "send()",
+        "at": 1546,
+        "data": { "type": "Blob", "data.hex": "53656e64696e67206120426c6f62", "meta": { "size": 14, "type": "" } }
+      },
+      { "type": "send()", "at": 1546, "data": { "type": "Buffer", "data.base64": "U2VuZGluZyBhIEJ1ZmZlcg==" } },
+      { "type": "send()", "at": 1546, "data": "Sending a string" },
+      {
+        "type": "message",
+        "at": 1651,
+        "data": { "type": "Blob", "data.hex": "53656e64696e67206120426c6f62", "meta": { "size": 14, "type": "" } },
+        "origin": "wss://echo.websocket.org"
+      }, {
+        "type": "message",
+        "at": 1652,
+        "data": { "type": "Blob", "data.hex": "53656e64696e67206120427566666572", "meta": { "size": 16, "type": "" } },
+        "origin": "wss://echo.websocket.org"
+      },
+      { "type": "message", "at": 1652, "data": "Sending a string", "origin": "wss://echo.websocket.org" },
+      { "type": "close()", "at": 1653 },
+      { "type": "get readyState", "at": 1653, "value": 2 },
+      { "type": "close", "at": 1758, "code": 1005, "reason": "", "wasClean": true },
+      { "type": "get readyState", "at": 1758, "value": 3 }
+    ]
+  }
+]

@@ -1,0 +1,105 @@
+[
+  {
+    "url": "wss://javascript.info/article/websocket/demo/hello",
+    "protocols": ["test"],
+    "log": [
+      { "type": "get protocol", "at": 17, "value": "" },
+      { "type": "get readyState", "at": 17, "value": 0 },
+      { "type": "error", "at": 409, "error": { "message": "Unexpected server response: 200" } },
+      { "type": "close", "at": 410, "code": 1006, "reason": "", "wasClean": false }
+    ]
+  }, {
+    "url": "wss://localhost:1/",
+    "log": [
+      { "type": "get protocol", "at": 2, "value": "" },
+      { "type": "get readyState", "at": 2, "value": 0 },
+      { "type": "error", "at": 5, "code": "ECONNREFUSED", "error": { "message": "", "code": "ECONNREFUSED" } },
+      { "type": "get protocol", "at": 5, "value": "" },
+      { "type": "close", "at": 6, "code": 1006, "reason": "", "wasClean": false }
+    ]
+  }, {
+    "url": "wss://echo.websocket.org/",
+    "log": [
+      { "type": "get readyState", "at": 1, "value": 0 },
+      { "type": "open", "at": 300 },
+      { "type": "get readyState", "at": 300, "value": 1 },
+      { "type": "message", "at": 301, "data": "Request served by 1781505b56ee58" },
+      { "type": "set binaryType", "at": 302, "value": "arraybuffer" },
+      { "type": "get binaryType", "at": 302, "value": "arraybuffer" },
+      { "type": "send()", "at": 303, "data": "Hello here" },
+      { "type": "message", "at": 416, "data": "Hello here" },
+      { "type": "send()", "at": 417, "data": { "type": "Buffer", "data.base64": "SGVsbG8gdGhlcmU=" } },
+      { "type": "message", "at": 522, "data": { "type": "ArrayBuffer", "data.hex": "48656c6c6f207468657265" } },
+      { "type": "send()", "at": 523, "data": { "type": "Uint8Array", "data.hex": "030507" } },
+      { "type": "message", "at": 627, "data": { "type": "ArrayBuffer", "data.hex": "030507" } },
+      { "type": "send()", "at": 628, "data": { "type": "Uint32Array", "data.hex": "ffffffff0000010000000080" } },
+      { "type": "message", "at": 732, "data": { "type": "ArrayBuffer", "data.hex": "ffffffff0000010000000080" } },
+      { "type": "send()", "at": 733, "data": { "type": "ArrayBuffer", "data.hex": "012a0002" } },
+      { "type": "message", "at": 837, "data": { "type": "ArrayBuffer", "data.hex": "012a0002" } },
+      {
+        "type": "send()",
+        "at": 837,
+        "data": { "type": "Blob", "data.hex": "6f6e6574776f", "meta": { "size": 6, "type": "" } }
+      },
+      { "type": "message", "at": 941, "data": { "type": "ArrayBuffer", "data.hex": "6f6e6574776f" } },
+      { "type": "set binaryType", "at": 942, "value": "blob" },
+      { "type": "get binaryType", "at": 942, "value": "blob" },
+      { "type": "send()", "at": 942, "data": "This is not a blob" },
+      { "type": "message", "at": 1046, "data": "This is not a blob" },
+      { "type": "send()", "at": 1047, "data": { "type": "Buffer", "data.base64": "VGhpcyBpcyBhIGJsb2I=" } },
+      {
+        "type": "message",
+        "at": 1151,
+        "data": { "type": "Blob", "data.hex": "54686973206973206120626c6f62", "meta": { "size": 14, "type": "" } }
+      },
+      { "type": "send()", "at": 1153, "data": { "type": "Uint8Array", "data.hex": "0b162c39" } },
+      {
+        "type": "message",
+        "at": 1258,
+        "data": { "type": "Blob", "data.hex": "0b162c39", "meta": { "size": 4, "type": "" } }
+      }, {
+        "type": "send()",
+        "at": 1259,
+        "data": { "type": "Uint32Array", "data.hex": "00000100ffffffff0000000000000080" }
+      }, {
+        "type": "message",
+        "at": 1366,
+        "data": { "type": "Blob", "data.hex": "00000100ffffffff0000000000000080", "meta": { "size": 16, "type": "" } }
+      },
+      { "type": "send()", "at": 1367, "data": { "type": "ArrayBuffer", "data.hex": "33003534" } },
+      {
+        "type": "message",
+        "at": 1470,
+        "data": { "type": "Blob", "data.hex": "33003534", "meta": { "size": 4, "type": "" } }
+      }, {
+        "type": "send()",
+        "at": 1471,
+        "data": { "type": "Blob", "data.hex": "7468726565666f757266697665", "meta": { "size": 13, "type": "" } }
+      }, {
+        "type": "message",
+        "at": 1574,
+        "data": { "type": "Blob", "data.hex": "7468726565666f757266697665", "meta": { "size": 13, "type": "" } }
+      }, {
+        "type": "send()",
+        "at": 1576,
+        "data": { "type": "Blob", "data.hex": "53656e64696e67206120426c6f62", "meta": { "size": 14, "type": "" } }
+      },
+      { "type": "send()", "at": 1576, "data": { "type": "Buffer", "data.base64": "U2VuZGluZyBhIEJ1ZmZlcg==" } },
+      { "type": "send()", "at": 1576, "data": "Sending a string" },
+      {
+        "type": "message",
+        "at": 1681,
+        "data": { "type": "Blob", "data.hex": "53656e64696e67206120426c6f62", "meta": { "size": 14, "type": "" } }
+      }, {
+        "type": "message",
+        "at": 1682,
+        "data": { "type": "Blob", "data.hex": "53656e64696e67206120427566666572", "meta": { "size": 16, "type": "" } }
+      },
+      { "type": "message", "at": 1682, "data": "Sending a string" },
+      { "type": "close()", "at": 1684 },
+      { "type": "get readyState", "at": 1684, "value": 2 },
+      { "type": "close", "at": 1789, "code": 1005, "reason": "", "wasClean": true },
+      { "type": "get readyState", "at": 1790, "value": 3 }
+    ]
+  }
+]
