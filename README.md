@@ -9,7 +9,7 @@ Zero-dependencies, bundleable
 Replayers can run in V8 / JavaScriptCore / Hermes even with no network API implemented at all
 
 ```js
-import { fetchRecorder, fetchReplayer, WebSocketRecorder, WebSocketReplayer, prettyJSON } from ...
+import { fetchRecorder, fetchReplayer, WebSocketRecorder, WebSocketReplayer, prettyJSON } from '@exodus/replay'
 ```
 
 Generated logs [are human-readable](#samples)
