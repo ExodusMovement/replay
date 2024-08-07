@@ -1,4 +1,4 @@
-# Record/replay `fetch` and `WebSocket` sessions
+# Record/inspect/replay `fetch` and `WebSocket` sessions
 
 For offline testing
 
