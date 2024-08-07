@@ -26,6 +26,7 @@
   },
   "files": [
     "fetch.js",
+    "index.js",
     "utils.js",
     "websocket.js",
     "CHANGELOG.md"
