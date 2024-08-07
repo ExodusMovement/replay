@@ -31,13 +31,19 @@
     "CHANGELOG.md"
   ],
   "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
     "test:replay": "node --test tests/*.replay*.test.js",
     "test": "node --test"
   },
   "devDependencies": {
+    "@exodus/eslint-config": "^5.24.0",
+    "@exodus/prettier": "^1.0.0",
+    "eslint": "^8.44.0",
     "expect": "^29.7.0",
     "node-fetch": "^3.3.2",
     "ws": "^8.18.0"
   },
+  "prettier": "@exodus/prettier",
   "packageManager": "pnpm@9.7.0+sha512.dc09430156b427f5ecfc79888899e1c39d2d690f004be70e05230b72cb173d96839587545d09429b55ac3c429c801b4dc3c0e002f653830a420fa2dd4e3cf9cf"
 }

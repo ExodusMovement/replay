@@ -3,6 +3,7 @@
 // Having it cjs because of a conditional import and node:test lifecycle bug with dynamic describe/test
 
 /* eslint-disable unicorn/prefer-add-event-listener */
+/* global WebSocket */
 
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
