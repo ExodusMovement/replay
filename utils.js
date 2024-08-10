@@ -40,6 +40,7 @@ const dehex = (str) => str.match(/(..)/g).map((x) => parseInt(x, 16))
 // For request body and message serialization
 // Returns a promise for Blob / File or FormData with Blob / File, is sync otherwise
 export function serializeBody(body) {
+  if (typeof body === 'number' || typeof body === 'bigint') return `${body}`
   if (!body || typeof body === 'string') return body
   const proto = Object.getPrototypeOf(body)
   const wrap = (data, sub = '', r) => ({ type: body.constructor.name, [`data${sub}`]: data, ...r })
