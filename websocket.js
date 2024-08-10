@@ -73,22 +73,20 @@ const EventTargetClass =
     #listeners = new Map()
 
     #getListeners(type) {
-      if (!this.#listeners.has(type)) this.#listeners.set(type, [])
+      if (!this.#listeners.has(type)) this.#listeners.set(type, new Set())
       return this.#listeners.get(type)
     }
 
     addEventListener(type, fn, ...r) {
       if (!type || !fn) throw new Error('The "type" and "listener" arguments must be specified')
       if (r.length > 0) throw new Error('Extra parameters to addEventListener are not supported')
-      this.#getListeners(type).push(fn)
+      this.#getListeners(type).add(fn)
     }
 
     removeEventListener(type, fn, ...r) {
       if (!type || !fn) throw new Error('The "type" and "listener" arguments must be specified')
       if (r.length > 0) throw new Error('Extra parameters to removeEventListener are not supported')
-      const listeners = this.#getListeners(type)
-      const id = listeners.indexOf(fn)
-      if (id >= 0) listeners.splice(id, 1) // TODO: recheck if we should remove just one
+      this.#getListeners(type).delete(fn)
     }
 
     dispatchEvent(event) {
@@ -99,6 +97,8 @@ const EventTargetClass =
           throwLater(error)
         }
       }
+
+      return event.defaultPrevented !== true
     }
   }
 
