@@ -122,7 +122,7 @@ class BaseWebSocket extends EventTargetClass {
         set(value) {
           if (current) this.removeEventListener(type, current)
           current = value
-          this.addEventListener(type, current)
+          if (current) this.addEventListener(type, current)
         },
       })
     }
