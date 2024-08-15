@@ -137,3 +137,8 @@ testBlob('GET https://dummyjson.com/image/1 blob', async () => {
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADUlEQVR4nGM4derUfwAIHgNeAOmyrwAAAABJRU5ErkJggg=='
   )
 })
+
+test('connection refused error', async () => {
+  const request = fetch('http://127.0.0.1/')
+  await assert.rejects(request, /(fetch failed|ECONNREFUSED)/)
+})

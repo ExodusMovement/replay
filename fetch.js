@@ -69,7 +69,7 @@ function deserializeResponseBody(body, bodyType) {
   throw new Error('Unexpected bodyType in fetch recording log')
 }
 
-const serializeResponse = async (resource, options = {}, response) => {
+async function serializeResponse(resource, options = {}, response) {
   if (!['default', 'basic'].includes(response.type)) {
     throw new Error(`Can not record fetch response, unexpected type: ${response.type}`)
   }
@@ -84,6 +84,13 @@ const serializeResponse = async (resource, options = {}, response) => {
     redirected: response.redirected,
     type: response.type,
     ...(await serializeResponseBody(response)),
+  }
+}
+
+async function serializeError(resource, options = {}, error) {
+  return {
+    request: await serializeRequest(resource, options),
+    error: { message: error.message, code: error.code },
   }
 }
 
@@ -114,9 +121,14 @@ export function fetchRecorder(log, { fetch: _fetch = globalThis.fetch?.bind?.(gl
   if (!Array.isArray(log)) throw new Error('log should be passed')
   if (!_fetch) throw new Error('No fetch implementation passed, no global fetch exists')
   return async function fetch(resource, options) {
-    const res = await _fetch(resource, options)
-    log.push(await serializeResponse(resource, options, res))
-    return res
+    try {
+      const res = await _fetch(resource, options)
+      log.push(await serializeResponse(resource, options, res))
+      return res
+    } catch (err) {
+      log.push(await serializeError(resource, options, err))
+      throw err
+    }
   }
 }
 
@@ -129,8 +141,13 @@ export function fetchReplayer(log) {
     if (id < 0) throw new Error(`Request to ${resource} not found, ${log.length} more entries left`)
     const [entry] = log.splice(id, 1)
     const { status, statusText, ok, url, redirected, type, headers = [], body, bodyType } = entry
-    const props = { status, statusText, ok, url, redirected, type }
 
+    if (entry.error) {
+      const { message, ...rest } = entry.error
+      throw new TypeError(message, rest)
+    }
+
+    const props = { status, statusText, ok, url, redirected, type }
     try {
       // Try to return a native Response
       if (typeof Response !== 'undefined') return makeResponse({ body, bodyType }, headers, props)
