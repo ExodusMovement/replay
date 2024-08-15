@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/prefer-add-event-listener */
 
-import { serializeBody, deserializeBody, bodyMatches } from './utils.js'
+import { serializeBody, deserializeBody, bodyMatches } from './util.js'
 
 const { setImmediate, setTimeout, clearTimeout } = globalThis
 const EVENT_TYPES = new Set(['open', 'message', 'close', 'error'])

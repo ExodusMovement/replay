@@ -99,3 +99,41 @@ testFormData('POST https://dummyjson.com/posts/add with FormData', async () => {
   const post = await res.json()
   assert.deepEqual(post, { title: 'awesome', userId: '42', id: 252 })
 })
+
+test('GET https://dummyjson.com/image/2 arrayBuffer', async () => {
+  const res = await fetch('https://dummyjson.com/image/2')
+  assert.equal(res.status, 200)
+  if (typeof Headers !== 'undefined') {
+    assert.equal(res.headers.get('content-type'), 'image/png')
+    assert.equal(res.headers.get('content-length'), '95')
+  }
+
+  const buf = await res.arrayBuffer()
+  assert.ok(Object.getPrototypeOf(buf) === ArrayBuffer.prototype)
+  assert.equal(buf.byteLength, 95)
+  assert.deepEqual(
+    Buffer.from(buf).toString('base64'),
+    'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAEUlEQVR4nGM4derUfxBmgDEAd+gNdaE1fMIAAAAASUVORK5CYII='
+  )
+})
+
+const testBlob = typeof Blob === 'undefined' ? test.skip : test
+testBlob('GET https://dummyjson.com/image/1 blob', async () => {
+  const res = await fetch('https://dummyjson.com/image/1')
+  assert.equal(res.status, 200)
+  if (typeof Headers !== 'undefined') {
+    assert.equal(res.headers.get('content-type'), 'image/png')
+    assert.equal(res.headers.get('content-length'), '91')
+  }
+
+  const blob = await res.blob()
+  assert.equal(blob.constructor.name, 'Blob') // node-fetch Blob and global Blob might differ
+  assert.equal(blob.size, 91)
+  assert.equal(blob.type, 'image/png')
+  const buf = await blob.arrayBuffer()
+  assert.equal(buf.byteLength, 91)
+  assert.deepEqual(
+    Buffer.from(buf).toString('base64'),
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAADUlEQVR4nGM4derUfwAIHgNeAOmyrwAAAABJRU5ErkJggg=='
+  )
+})

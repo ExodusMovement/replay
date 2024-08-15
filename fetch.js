@@ -1,4 +1,4 @@
-import { isPlainObject, prettyJSON, keySortedJSON, serializeBody } from './utils.js'
+import { isPlainObject, prettyJSON, keySortedJSON, serializeBody, deserializeBody } from './util.js'
 
 function serializeHeaders(headers) {
   if (!headers || Array.isArray(headers)) return headers
@@ -35,6 +35,17 @@ const serializeRequest = async (resource, options = {}) => {
   }
 }
 
+function maybeText(response) {
+  // Doesn't have to be strong, this just avoids attempting to .text() on certain response types
+  try {
+    const type = response.headers.get('content-type').trim().split(';')[0]
+    if (type.startsWith('image/') && !type.endsWith('+xml')) return false
+    if (type.startsWith('audio/') || type.startsWith('video/')) return false
+  } catch {}
+
+  return true
+}
+
 async function serializeResponseBody(response) {
   try {
     if (response.headers.get('content-type').trim().split(';')[0] === 'application/json') {
@@ -42,12 +53,19 @@ async function serializeResponseBody(response) {
     }
   } catch {}
 
-  return { bodyType: 'text', body: await response.clone().text() }
+  if (maybeText(response)) {
+    const text = await response.clone().text()
+    if (!text.includes('\uFFFD')) return { bodyType: 'text', body: text }
+  }
+
+  const buffer = await response.clone().arrayBuffer()
+  return { bodyType: 'binary', body: await serializeBody(buffer) }
 }
 
 function deserializeResponseBody(body, bodyType) {
   if (bodyType === 'text') return body
-  if (bodyType === 'json') return prettyJSON(body)
+  if (bodyType === 'json') return prettyJSON(body) // need to re-encode it as clone() exists
+  if (bodyType === 'binary' && body?.type === 'ArrayBuffer') return deserializeBody(body)
   throw new Error('Unexpected bodyType in fetch recording log')
 }
 
@@ -74,10 +92,14 @@ function makeResponseBase(bodyType, body, init) {
   if (bodyType === 'text' && Response.text) return Response.text(body, init)
   if (bodyType === 'json') return new Response(prettyJSON(body), init)
   if (bodyType === 'text') return new Response(body, init)
+  if (bodyType === 'binary' && body?.type === 'ArrayBuffer') {
+    return new Response(deserializeBody(body), init)
+  }
+
   throw new Error('Unexpected bodyType')
 }
 
-function makeResponse({ bodyType, body }, { status, statusText, headers, ok, ...extra }) {
+function makeResponse({ bodyType, body }, headers, { status, statusText, ok, ...extra }) {
   // init supports only { status, statusText, headers } per spec, we have to restore the rest manually
   const response = makeResponseBase(bodyType, body, { status, statusText, headers })
   if (response.ok !== ok) throw new Error('Unexpected: ok mismatch')
@@ -107,17 +129,32 @@ export function fetchReplayer(log) {
     if (id < 0) throw new Error(`Request to ${resource} not found, ${log.length} more entries left`)
     const [entry] = log.splice(id, 1)
     const { status, statusText, ok, url, redirected, type, headers = [], body, bodyType } = entry
-    const getHeaders = () => (typeof Headers === 'undefined' ? [...headers] : new Headers(headers))
-    const props = { status, statusText, ok, url, redirected, type, headers: getHeaders() }
+    const props = { status, statusText, ok, url, redirected, type }
 
-    // Try to return a native Response
     try {
-      if (typeof Response !== 'undefined') return makeResponse({ body, bodyType }, props)
+      // Try to return a native Response
+      if (typeof Response !== 'undefined') return makeResponse({ body, bodyType }, headers, props)
     } catch {} // passthrough and return a plain object
 
-    const bodyText = deserializeResponseBody(body, bodyType) // To support clone(), we don't want to actually return original object refs
-    const res = { ...props, text: async () => bodyText, json: async () => JSON.parse(bodyText) }
-    res.clone = () => ({ ...res, headers: getHeaders() })
-    return res
+    const data = deserializeResponseBody(body, bodyType)
+    const getText = () => (typeof data === 'string' ? data : Buffer.from(data).toString('utf8'))
+    const bufferToAB = (buf) => buf.buffer.slice(0, buf.byteOffset, buf.byteOffset + buf.byteLength)
+    const getAB = () => (typeof data === 'string' ? bufferToAB(Buffer.from(data)) : data.slice(0)) // eslint-disable-line unicorn/prefer-spread
+    const getHeaders = () => (typeof Headers === 'undefined' ? [...headers] : new Headers(headers))
+    const cType = () => getHeaders().get?.('content-type') ?? new Map(headers).get('content-type')
+    const fallbackResponse = () => ({
+      ...props,
+      text: async () => getText(),
+      json: async () => JSON.parse(getText()),
+      arrayBuffer: async () => getAB(),
+      blob: () => new Blob([data], { type: cType() }),
+      headers: getHeaders(),
+      clone: () => fallbackResponse(),
+      get body() {
+        if (typeof ReadableStream !== 'undefined') return { locked: false } // just trigger browser detection to make certain clients use .json() instead
+        return ReadableStream.from(new Uint8Array(getAB()))
+      },
+    })
+    return fallbackResponse()
   }
 }
