@@ -309,9 +309,10 @@ export function WebSocketRecorder(log, { WebSocket: _WebSocket = globalThis.WebS
 
 export function WebSocketReplayer(log, { interval = 0 } = {}) {
   if (!Array.isArray(log)) throw new Error('log should be passed')
+  const logClone = [...log] // need to clone as we mutate it
   return class WebSocket extends ReplayWebSocket {
     constructor(...args) {
-      super([...log], interval, ...args) // log is cloned as we mutate it
+      super(logClone, interval, ...args)
     }
   }
 }
