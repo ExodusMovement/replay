@@ -1,6 +1,6 @@
 {
   "name": "@exodus/replay",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0-rc.4",
   "author": "Exodus Movement, Inc.",
   "description": "Record/inspect/replay fetch and WebSocket sessions",
   "homepage": "https://github.com/ExodusMovement/replay",
